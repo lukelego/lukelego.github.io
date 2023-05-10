@@ -6,16 +6,31 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>Shift Rduce Parser</title>
+        <title>Shift Reduce Parser</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             table {
                 table-layout: fixed;
-                width:100%;
+                width:40%;
+                border: 1px solid black;
+                text-align: center;
             }
             td, th {
                 padding: 10px;
+            }
+            th {
+                background-color: #d3d3d3;
+            }
+            #Grammar-rules {
+                position: absolute;
+                border: 1px solid black;
+                top: 50px;
+                right: 100px;
+                width: 180px;
+            }
+            #parse-output {
+                width: 20%;
             }
         </style>
     </head>
@@ -24,12 +39,13 @@ and open the template in the editor.
         <div>
             <table id = "Parse-table" border = "1">
                 <colgroup>
+                    <col span ="1">
                     <col span ="6">
                     <col span ="3">
                 </colgroup>
                 <thead>
                     <tr>
-                        <th></th>
+                        <th colspan = "1"></th>
                         <th colspan ="6"> Action </th>
                         <th colspan ="3"> GoTo </th>
                     </tr>
@@ -71,8 +87,378 @@ and open the template in the editor.
                         <td></td>
                         <td></td>
                     </tr>
+                    <tr>
+                        <th>2</th>
+                        <td></td>
+                        <td>R2</td>
+                        <td>S7</td>
+                        <td></td>
+                        <td>R2</td>
+                        <td>R2</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>3</th>
+                        <td></td>
+                        <td>R4</td>
+                        <td>R4</td>
+                        <td></td>
+                        <td>R4</td>
+                        <td>R4</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>4</th>
+                        <td>S5</td>
+                        <td></td>
+                        <td></td>
+                        <td>S4</td>
+                        <td></td>
+                        <td></td>
+                        <td>8</td>
+                        <td>2</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <th>5</th>
+                        <td></td>
+                        <td>R6</td>
+                        <td>R6</td>
+                        <td></td>
+                        <td>R6</td>
+                        <td>R6</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>6</th>
+                        <td>S5</td>
+                        <td></td>
+                        <td></td>
+                        <td>S4</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>9</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <th>7</th>
+                        <td>S5</td>
+                        <td></td>
+                        <td></td>
+                        <td>S4</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <th>8</th>
+                        <td></td>
+                        <td>S6</td>
+                        <td></td>
+                        <td></td>
+                        <td>S11</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>9</th>
+                        <td></td>
+                        <td>R1</td>
+                        <td>S7</td>
+                        <td></td>
+                        <td>R1</td>
+                        <td>R1</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>10</th>
+                        <td></td>
+                        <td>R3</td>
+                        <td>R3</td>
+                        <td></td>
+                        <td>R3</td>
+                        <td>R3</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>11</th>
+                        <td></td>
+                        <td>R5</td>
+                        <td>R5</td>
+                        <td></td>
+                        <td>R5</td>
+                        <td>R5</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
+        
+        <table id ="Grammar-rules" >
+            <thead>
+                <tr> 
+                    <th>Grammar Rules</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr> 
+                    <td>
+                        
+                        <ol>
+                        <li>E -> E + T </li>
+                        <li>E -> T </li>
+                        <li>T -> T * F </li>
+                        <li>T -> F </li>
+                        <li>F -> (E) </li>
+                        <li>F -> id </li>
+                        </ol>
+                        
+                    </td>
+                </tr>
+            </tbody>
+            
+        </table>
+        
+        <form onSubmit="submitFunction(event);">
+            <label for="expression">Enter your text:</label>
+            <input type="text" id="expression" name="expression">
+            <input type="submit" value="Submit">
+        </form>
+        
+        <div>
+            <table id ="parse-output">
+                
+                <tr>
+                    <th>Expression</th> 
+                    <th>Grammar</th>
+                </tr>
+                
+            </table>
+        </div>
+        
+        <script>
+           
+            var myTable = document.querySelector("#Parse-table");
+            var grammarRules = document.querySelector("#Grammar-rules");
+            
+           function submitFunction(event){
+               event.preventDefault();
+               var expression = document.getElementById("expression").value;
+               
+               console.log("parsing");
+               console.log(expression);
+               parseExpression(expression, myTable, grammarRules);
+           }
+            
+            function Unit(token, state){
+                if(token){
+                    this.token = token;
+                }
+                
+                this.state = state;
+            }
+            
+            function getTableVal(table, unit){  //given the next token and the state, it finds the corresponding value in the table
+                const firstRow = table.rows[1].querySelectorAll('td');
+                const firstRowArr = Array.from(firstRow);
+                
+                const tokenVals = firstRowArr.map(td => td.textContent); //array of all possible token values
+                var tokenIndex = 0;
+                
+                var foundToken = false;
+                for(let i = 0; i < tokenVals.length; i++){
+                    if(unit.token.toString() === tokenVals[i]){
+                        tokenIndex = i;
+                        foundToken = true;
+                    }
+                }
+                if(!foundToken) return "Error, incorrect token used";
+                
+                //Now go through the column associated with the row index and try to find the box associated with the correct state row.
+               const numRows = table.rows.length;
+               var command = "Error, not a valid state value";
+               for(let rowIndex = 0; rowIndex < numRows; rowIndex++){
+                   if(table.rows[rowIndex].cells[0].textContent === unit.state.toString()){ //checks if we found the correct state value
+                        table.rows[rowIndex].cells[tokenIndex + 1].style.backgroundColor = "yellow";
+                        command = table.rows[rowIndex].cells[tokenIndex + 1].textContent; //gets the correct cell
+                   }
+               }
+               return command;
+            }
+            
+            //console.log(getTableVal(myTable, new Unit("id", '0'))); //test
+            
+            function parseExpression(expression, table, grammarRuleTable){
+                
+                let currentState = 0;
+                expArr = toTokenArray(expression);
+                let parseArray =[[new Unit(null,0)], expArr];
+                
+                
+                
+                while(expArr.length > 0){
+          
+                    
+                    addRow(printUnitArr(parseArray[0]), expArr.toString()); //show the user the the expression and the the parsing steps
+                    
+                    const firstToken = expArr[0];
+                    console.log("firstToken is " + firstToken);
+                    let firstUnit = new Unit(firstToken, currentState); //first Unit in the remaining expression
+   
+                    let tableVal = getTableVal(table, firstUnit);
+                    
+                    if(tableVal.length === 0){
+                        console.log("Error, table value not found");
+                    }
+                    else if(tableVal.substring(0,1) === "S"){
+                        console.log("Performing Shift Operation");
+                        expArr.splice(0,1);
+                        firstUnit.state = tableVal.substring(1,2); //If it is a shift operation - get the new appropriate state value
+                        currentState = tableVal.substring(1,2); //make the current state the new state value
+                        parseArray[0].push(firstUnit); //push the unit(token + state) into the stack.
+                        
+                    }
+                    else if(tableVal.substring(0,1) === "R"){
+                        console.log("Performing Reduce Operation");
+                        
+                        let gramRuleNum = tableVal.substring(1,2); 
+                        let gramRule = getGrammarRule(grammarRuleTable, gramRuleNum);
+                        
+                        let popCount = findPopCount(gramRule,parseArray);
+                        
+                        for(let i = 0; i < popCount; i++){  //reduce the tokens in parseArray
+                            parseArray[0].pop();
+                        }
+                        
+                        let goToToken = getTokensFromGramRule(gramRule, true);
+                        let newState = getTableVal(table, new Unit(goToToken, parseArray[0][parseArray[0].length - 1].state)); //Get's the new state value from the previous state value combined witht the new token
+                        console.log("The new token being pushed is " + goToToken + " and the new state is " + newState);
+                        parseArray[0].push(new Unit(goToToken, newState)); 
+                        currentState = newState;
+                        
+                    }
+                    else {
+                        console.log("DONE");
+                        break;
+                    }
+                     console.log("Parse array is: " + printUnitArr(parseArray[0]));
+                     
+                }
+            }
+            
+            
+            
+            //Helper function for reduce
+            //finds the number of units that need to be popped from the stack, according to the production rule
+            function findPopCount(gramRule, parseArray){  
+                let rhs = getTokensFromGramRule(gramRule, false);       
+                let popCount = 0;
+                let rhsIndex = rhs.length - 1;
+                
+               
+                
+                    for(let i = parseArray[0].length - 1; i >= 0; i--){
+                        //console.log(parseArray[0][i].token.toString());
+                        //console.log(rhs.substring(rhsIndex - 1,rhsIndex)); //the problem is, I need to get the full token of the grammar rule, rather than the last letter
+                       
+                       
+                        if(rhsIndex >= 0 && parseArray[0][i].token.toString() === rhs[rhsIndex]){ 
+                            console.log("adding to pop count");
+                            popCount++;
+                            rhsIndex--;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    return popCount;
+            }
+    
+            function toTokenArray(expression){
+                let tokenArr = [];
+                let token = "";
+                for(let i = 0; i < expression.length; i++){
+                    if(expression.substring(i, i+1) === " "){
+                        tokenArr.push(token);
+                        token = "";
+                    }
+                    else if(expression.substring(i, i+1) === "$"){
+                        tokenArr.push(token);
+                        tokenArr.push("$");
+                    }
+                    else {
+                        token = token + expression.substring(i, i+1);
+                    }
+   
+                }
+                return tokenArr;
+            }
+            
+            function getGrammarRule(gramRuleTable, gramRuleNum){
+                const list = gramRuleTable.querySelector("ol");
+                const listItems = list.children;
+      
+                return listItems[gramRuleNum - 1].textContent;
+                
+            }
+            
+            
+            function getTokensFromGramRule(gramRule, beforeArrow){ //have this function return an array, not string
+                arrow = gramRule.indexOf('>');
+                if(beforeArrow){
+                    return gramRule.substring(0, arrow - 1).split(" ").filter(Boolean); //filter(Boolean) removes blank spaces from the array
+                }
+                else{
+                    return gramRule.substring(arrow + 1).split(" ").filter(Boolean);
+                }
+                
+            }
+            
+            function printUnitArr(arr){
+                let str = "";
+                console.log("this is what is stored at token: " + arr[0].token);
+                for(let i = 0; i < arr.length; i++){
+                    if(arr[i].token === undefined){
+                        str += arr[i].state;
+                    }
+                    else {
+                    str += arr[i].token + "" + arr[i].state + "";
+                    }  
+                }
+                return str;
+            }
+            
+            function addRow(expression, grammar){  //adds a row to the output table
+                var table = document.getElementById("parse-output");
+                var row = table.insertRow(table.rows.length);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                cell1.innerHTML = expression;
+                cell2.innerHTML = grammar;
+                
+            }
+            
+
+            
+            //testing
+            
+        </script>
     </body>
 </html>
