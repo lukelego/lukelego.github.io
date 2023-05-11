@@ -26,11 +26,15 @@ and open the template in the editor.
                 position: absolute;
                 border: 1px solid black;
                 top: 50px;
-                right: 100px;
+                right: 690px;
                 width: 180px;
             }
             #parse-output {
-                width: 20%;
+                width: 30%;
+                position: absolute;
+                border: 1px solid black;
+                right: 180px;
+                top: 10px;
             }
         </style>
     </head>
@@ -237,7 +241,7 @@ and open the template in the editor.
         </table>
         
         <form onSubmit="submitFunction(event);">
-            <label for="expression">Enter your text:</label>
+            <label for="expression">Enter your expression:</label>
             <input type="text" id="expression" name="expression">
             <input type="submit" value="Submit">
         </form>
@@ -246,8 +250,8 @@ and open the template in the editor.
             <table id ="parse-output">
                 
                 <tr>
-                    <th>Expression</th> 
-                    <th>Grammar</th>
+                    <th>Output</th> 
+                    <th>Expression</th>
                 </tr>
                 
             </table>
@@ -307,60 +311,71 @@ and open the template in the editor.
             
             function parseExpression(expression, table, grammarRuleTable){
                 
+                
+               
+                
                 let currentState = 0;
                 expArr = toTokenArray(expression);
+                console.log(expArr);
                 let parseArray =[[new Unit(null,0)], expArr];
                 
+                let delay = 500;
+                let index = 0;
                 
-                
-                while(expArr.length > 0){
-          
-                    
-                    addRow(printUnitArr(parseArray[0]), expArr.toString()); //show the user the the expression and the the parsing steps
-                    
-                    const firstToken = expArr[0];
-                    console.log("firstToken is " + firstToken);
-                    let firstUnit = new Unit(firstToken, currentState); //first Unit in the remaining expression
-   
-                    let tableVal = getTableVal(table, firstUnit);
-                    
-                    if(tableVal.length === 0){
-                        console.log("Error, table value not found");
-                    }
-                    else if(tableVal.substring(0,1) === "S"){
-                        console.log("Performing Shift Operation");
-                        expArr.splice(0,1);
-                        firstUnit.state = tableVal.substring(1,2); //If it is a shift operation - get the new appropriate state value
-                        currentState = tableVal.substring(1,2); //make the current state the new state value
-                        parseArray[0].push(firstUnit); //push the unit(token + state) into the stack.
-                        
-                    }
-                    else if(tableVal.substring(0,1) === "R"){
-                        console.log("Performing Reduce Operation");
-                        
-                        let gramRuleNum = tableVal.substring(1,2); 
-                        let gramRule = getGrammarRule(grammarRuleTable, gramRuleNum);
-                        
-                        let popCount = findPopCount(gramRule,parseArray);
-                        
-                        for(let i = 0; i < popCount; i++){  //reduce the tokens in parseArray
-                            parseArray[0].pop();
+                function loopIteration(){
+                    if(expArr.length > 0){
+                        addRow(printUnitArr(parseArray[0]), expArr.join(" ")); //show the user the the expression and the the parsing steps
+
+                        const firstToken = expArr[0];
+                        console.log("firstToken is " + firstToken);
+                        let firstUnit = new Unit(firstToken, currentState); //first Unit in the remaining expression
+
+                        let tableVal = getTableVal(table, firstUnit);
+                        console.log("looking for table val: token " + firstUnit.token + " state: " + firstUnit.state);
+                        if(tableVal.length === 0){
+                            console.log("Error, table value not found");
                         }
-                        
-                        let goToToken = getTokensFromGramRule(gramRule, true);
-                        let newState = getTableVal(table, new Unit(goToToken, parseArray[0][parseArray[0].length - 1].state)); //Get's the new state value from the previous state value combined witht the new token
-                        console.log("The new token being pushed is " + goToToken + " and the new state is " + newState);
-                        parseArray[0].push(new Unit(goToToken, newState)); 
-                        currentState = newState;
-                        
-                    }
-                    else {
-                        console.log("DONE");
-                        break;
-                    }
-                     console.log("Parse array is: " + printUnitArr(parseArray[0]));
-                     
+                        else if(tableVal.substring(0,1) === "S"){
+                            console.log("Performing Shift Operation");
+                            expArr.splice(0,1);
+                            firstUnit.state = tableVal.substring(1,tableVal.length); //If it is a shift operation - get the new appropriate state value
+                            currentState = tableVal.substring(1,tableVal.length); //make the current state the new state value
+                            parseArray[0].push(firstUnit); //push the unit(token + state) into the stack.
+
+                        }
+                        else if(tableVal.substring(0,1) === "R"){
+                            console.log("Performing Reduce Operation");
+
+                            let gramRuleNum = tableVal.substring(1,tableVal.length); 
+                            let gramRule = getGrammarRule(grammarRuleTable, gramRuleNum);
+
+                            let popCount = findPopCount(gramRule,parseArray);
+                            console.log("pop count is " + popCount);
+                            for(let i = 0; i < popCount; i++){  //reduce the tokens in parseArray
+                                parseArray[0].pop();
+                            }
+
+                            //let goToToken = getTokensFromGramRule(gramRule, true);
+                            let arrow = gramRule.indexOf(">");
+                            let goToToken = toTokenArray(gramRule.substring(0, arrow - 1));
+                            let newState = getTableVal(table, new Unit(goToToken, parseArray[0][parseArray[0].length - 1].state)); //Get's the new state value from the previous state value combined witht the new token
+                            console.log("The new token being pushed is " + goToToken + " and the new state is " + newState);
+                            parseArray[0].push(new Unit(goToToken, newState)); 
+                            currentState = newState;
+
+                        }
+                        else {
+                            console.log("DONE");
+                            return;
+                        }
+                         console.log("Parse array is: " + printUnitArr(parseArray[0]));
+                         console.log("Expression array is " + expArr);
+                         
+                         index++;
+                         setTimeout(loopIteration, delay);
+                     }
                 }
+                setTimeout(loopIteration, delay);
             }
             
             
@@ -368,18 +383,20 @@ and open the template in the editor.
             //Helper function for reduce
             //finds the number of units that need to be popped from the stack, according to the production rule
             function findPopCount(gramRule, parseArray){  
-                let rhs = getTokensFromGramRule(gramRule, false);       
+                //let rhs = getTokensFromGramRule(gramRule, false);  
+                arrow = gramRule.indexOf(">");
+                let rhs = toTokenArray(gramRule.substring(arrow+1));
                 let popCount = 0;
                 let rhsIndex = rhs.length - 1;
                 
-               
+                console.log("rhs of rule " + rhs);
                 
                     for(let i = parseArray[0].length - 1; i >= 0; i--){
                         //console.log(parseArray[0][i].token.toString());
                         //console.log(rhs.substring(rhsIndex - 1,rhsIndex)); //the problem is, I need to get the full token of the grammar rule, rather than the last letter
-                       
-                       
+
                         if(rhsIndex >= 0 && parseArray[0][i].token.toString() === rhs[rhsIndex]){ 
+                        
                             console.log("adding to pop count");
                             popCount++;
                             rhsIndex--;
@@ -394,9 +411,38 @@ and open the template in the editor.
             function toTokenArray(expression){
                 let tokenArr = [];
                 let token = "";
+                let str = "";
                 for(let i = 0; i < expression.length; i++){
-                    if(expression.substring(i, i+1) === " "){
-                        tokenArr.push(token);
+                    
+                    str = expression.substring(i, i+1);
+                    if(str === '(' || str === ')' || str === '$' || str === '+' || str === '*' || str === 'E' || str === 'F' || str === 'T'){
+                        tokenArr.push(str);
+                    }
+                    else if(str === "i"){
+                        tokenArr.push("id");
+                        i++;
+                    }
+            /*
+                    
+                    if(expression.substring(i, i+1) === '('){
+                        if(token.length > 0){
+                            tokenArr.push(token);
+                        }
+                        tokenArr.push('(');
+                        token = "";
+                    }
+                    else if(expression.substring(i, i+1) === ')'){
+                        if(token.length > 0){
+                            tokenArr.push(token);
+                        }
+                        tokenArr.push(')');
+                        token = "";
+                    }
+                    else if(expression.substring(i, i+1) === " "){
+                        if(token.length > 0){
+                            tokenArr.push(token);
+                        }
+                        
                         token = "";
                     }
                     else if(expression.substring(i, i+1) === "$"){
@@ -406,9 +452,12 @@ and open the template in the editor.
                     else {
                         token = token + expression.substring(i, i+1);
                     }
-   
+                */
                 }
-                return tokenArr;
+                
+                //make sure there are no empty values in the array
+                console.log("token Arrary is : " + tokenArr);
+                return tokenArr.filter(element => element !== "");
             }
             
             function getGrammarRule(gramRuleTable, gramRuleNum){
@@ -422,6 +471,8 @@ and open the template in the editor.
             
             function getTokensFromGramRule(gramRule, beforeArrow){ //have this function return an array, not string
                 arrow = gramRule.indexOf('>');
+                let arr = [];
+                
                 if(beforeArrow){
                     return gramRule.substring(0, arrow - 1).split(" ").filter(Boolean); //filter(Boolean) removes blank spaces from the array
                 }
@@ -454,8 +505,8 @@ and open the template in the editor.
                 cell2.innerHTML = grammar;
                 
             }
-            
-
+                
+             
             
             //testing
             
