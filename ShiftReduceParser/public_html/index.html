@@ -11,8 +11,6 @@ and open the template in the editor.
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             table {
-                table-layout: fixed;
-                width:40%;
                 border: 1px solid black;
                 text-align: center;
             }
@@ -23,24 +21,23 @@ and open the template in the editor.
                 background-color: #d3d3d3;
             }
             #Grammar-rules {
-                position: absolute;
                 border: 1px solid black;
                 top: 50px;
-                right: 690px;
-                width: 180px;
+
             }
             #parse-output {
                 width: 30%;
-                position: absolute;
                 border: 1px solid black;
                 right: 180px;
-                top: 10px;
             }
+
+            
         </style>
     </head>
         
     <body>
-        <div>
+        <div style = "width:100%">
+            <div style = "float: left; width:50%">
             <table id = "Parse-table" border = "1">
                 <colgroup>
                     <col span ="1">
@@ -213,9 +210,9 @@ and open the template in the editor.
                     </tr>
                 </tbody>
             </table>
-        </div>
-        
-        <table id ="Grammar-rules" >
+            </div>
+            <div style="float: left; width:20%">
+                 <table id ="Grammar-rules" >
             <thead>
                 <tr> 
                     <th>Grammar Rules</th>
@@ -238,15 +235,11 @@ and open the template in the editor.
                 </tr>
             </tbody>
             
-        </table>
-        
-        <form onSubmit="submitFunction(event);">
-            <label for="expression">Enter your expression:</label>
-            <input type="text" id="expression" name="expression">
-            <input type="submit" value="Submit">
-        </form>
-        
-        <div>
+            </table>
+            </div>
+            
+            
+            <div style= "float: left; width:50%">
             <table id ="parse-output">
                 
                 <tr>
@@ -255,7 +248,20 @@ and open the template in the editor.
                 </tr>
                 
             </table>
+            </div>
+           
+             <br style="clear: left;" />
         </div>
+        
+       
+        
+        <form onSubmit="submitFunction(event);">
+            <label for="expression">Enter your expression:</label>
+            <input type="text" id="expression" name="expression">
+            <input type="submit" value="Submit">
+        </form>
+        
+        
         
         <script>
            
